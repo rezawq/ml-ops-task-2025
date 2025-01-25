@@ -17,3 +17,13 @@ variable "yc_zone" {
   type        = string
   description = "Zone for Yandex Cloud resources"
 }
+
+variable "yc_service_account_name" {
+  type        = string
+  description = "Name of the service account"
+}
+
+variable "yc_bucket_name" {
+  type        = string
+  description = "Name of the bucket"
+}

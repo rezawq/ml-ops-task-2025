@@ -1,0 +1,6 @@
+yc_token                 = "yc_token"
+yc_cloud_id              = "b1g4qgqov7nbl5sn3vhl"
+yc_folder_id             = "b1gdo3s8323p2nfiiqgl"
+yc_zone                  = "ru-central1-a"
+yc_service_account_name  = "aresh2025-sa"
+yc_bucket_name           = "aresh2025-bucket"
