@@ -41,4 +41,8 @@ TARGET_BUCKET=aresh2025-bucket-b1gdo3s8323p2nfiiqgl
 s3cmd sync --acl-public  s3://otus-mlops-source-data/ s3://$TARGET_BUCKET/
 ```
 
+### 2. Создание Spark-кластера
+
+Описан в [main.tf](terraform/main.tf)
+
 
