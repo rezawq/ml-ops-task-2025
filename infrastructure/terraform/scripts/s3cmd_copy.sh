@@ -12,7 +12,7 @@ log "Starting user data script execution"
 
 # Устанавливаем s3cmd
 log "Installing s3cmd"
-apt-get install -y s3cmd
+sudo apt-get install -y s3cmd
 
 
 # Настраиваем s3cmd
