@@ -180,3 +180,4 @@ cython_debug/
 /infrastructure/terraform/terraform.tfvars
 /infrastructure/terraform/terraform.tfstate
 /infrastructure/terraform/terraform.tfstate.backup
+/infrastructure/terraform/terraform-aresh2025.tfvars

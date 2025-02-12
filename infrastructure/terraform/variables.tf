@@ -73,10 +73,10 @@ variable "public_key_path" {
   description = "Path to the public key file"
 }
 
-# variable "private_key_path" {
-#   type        = string
-#   description = "Path to the private key file"
-# }
+variable "private_key_path" {
+  type        = string
+  description = "Path to the private key file"
+}
 
 variable "dataproc_master_resources" {
   type = object({
@@ -103,3 +103,27 @@ variable "dataproc_data_resources" {
     disk_size          = 128
   }
 }
+
+variable "dataproc_compute_resources" {
+  type = object({
+    resource_preset_id = string
+    disk_type_id       = string
+    disk_size          = number
+  })
+  default = {
+    resource_preset_id = "s3-c4-m16"
+    disk_type_id       = "network-ssd"
+    disk_size          = 128
+  }
+}
+
+variable "yc_image_id" {
+  type        = string
+  description = "ID of the image for the virtual machine"
+}
+
+variable "yc_instance_name" {
+  type        = string
+  description = "Name of the virtual machine"
+}
+
