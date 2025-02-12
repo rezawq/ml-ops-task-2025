@@ -34,7 +34,7 @@ resource "yandex_storage_bucket" "data_bucket" {
   bucket        = "${var.yc_bucket_name}-${var.yc_folder_id}"
   access_key    = yandex_iam_service_account_static_access_key.sa-static-key.access_key
   secret_key    = yandex_iam_service_account_static_access_key.sa-static-key.secret_key
-  force_destroy = true
+  force_destroy = false
   # default_storage_class = "COLD"
   anonymous_access_flags {
     read = true
@@ -129,7 +129,7 @@ resource "yandex_vpc_security_group" "security_group" {
 
 # Dataproc ресурсы
 resource "yandex_dataproc_cluster" "dataproc_cluster" {
-  depends_on  = [yandex_resourcemanager_folder_iam_member.sa_roles]
+  depends_on = [yandex_resourcemanager_folder_iam_member.sa_roles]
   bucket      = yandex_storage_bucket.data_bucket.bucket
   description = "Dataproc Cluster created by Terraform for OTUS project"
   name        = var.yc_dataproc_cluster_name
@@ -174,7 +174,88 @@ resource "yandex_dataproc_cluster" "dataproc_cluster" {
         disk_size          = var.dataproc_data_resources.disk_size
       }
       subnet_id   = yandex_vpc_subnet.subnet.id
-      hosts_count = 1
+      hosts_count = 3
+    }
+
+    subcluster_spec {
+      name = "compute"
+      role = "COMPUTENODE"
+      resources {
+        resource_preset_id = var.dataproc_compute_resources.resource_preset_id
+        disk_type_id       = "network-ssd"
+        disk_size          = var.dataproc_compute_resources.disk_size
+      }
+      subnet_id   = yandex_vpc_subnet.subnet.id
+      hosts_count = 3
     }
   }
+}
+
+# Compute ресурсы
+resource "yandex_compute_disk" "boot_disk" {
+  name     = "boot-disk"
+  zone     = var.yc_zone
+  image_id = var.yc_image_id
+  size     = 30
+}
+
+resource "yandex_compute_instance" "proxy" {
+  name                      = var.yc_instance_name
+  allow_stopping_for_update = true
+  platform_id               = "standard-v3"
+  zone                      = var.yc_zone
+  service_account_id        = yandex_iam_service_account.sa.id
+
+  metadata = {
+    ssh-keys = "ubuntu:${file(var.public_key_path)}"
+    user-data = templatefile("${path.root}/scripts/user_data.sh", {
+      token                       = var.yc_token
+      cloud_id                    = var.yc_cloud_id
+      folder_id                   = var.yc_folder_id
+      private_key                 = file(var.private_key_path)
+      access_key                  = yandex_iam_service_account_static_access_key.sa-static-key.access_key
+      secret_key                  = yandex_iam_service_account_static_access_key.sa-static-key.secret_key
+      s3_bucket                   = yandex_storage_bucket.data_bucket.bucket
+      upload_data_to_hdfs_content = file("${path.root}/scripts/upload_data_to_hdfs.sh")
+    })
+  }
+
+  scheduling_policy {
+    preemptible = true
+  }
+
+  resources {
+    cores  = 2
+    memory = 16
+  }
+
+  boot_disk {
+    disk_id = yandex_compute_disk.boot_disk.id
+  }
+
+  network_interface {
+    subnet_id = yandex_vpc_subnet.subnet.id
+    nat       = true
+  }
+
+  metadata_options {
+    gce_http_endpoint = 1
+    gce_http_token    = 1
+  }
+
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    private_key = file(var.private_key_path)
+    host        = self.network_interface[0].nat_ip_address
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo cloud-init status --wait",
+      "echo 'User-data script execution log:' | sudo tee /var/log/user_data_execution.log",
+      "sudo cat /var/log/cloud-init-output.log | sudo tee -a /var/log/user_data_execution.log",
+    ]
+  }
+  depends_on = [yandex_dataproc_cluster.dataproc_cluster]
 }
