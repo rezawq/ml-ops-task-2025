@@ -12,7 +12,7 @@
 make tf_apply
 ```
 
-После создания бакет доступен по адресу s3://aresh2025-bucket-b1gdo3s8323p2nfiiqgl или https://storage.yandexcloud.net/aresh2025-bucket-b1gdo3s8323p2nfiiqgl/
+После создания бакет доступен по адресу s3://rezawq-bucket-b1g13sct68pr90ornldm или https://storage.yandexcloud.net/rezawq-bucket-b1g13sct68pr90ornldm/
 
 ### 2. Копирование из s3://otus-mlops-source-data/ в новый bucket
 
@@ -74,25 +74,34 @@ hadoop distcp s3a://$s3_bucket/ /user/ubuntu/data
 hdfs dfs -ls /user/ubuntu/data
 ```
 
+### 5. Jump Server
 
-Если перезапускать операцию несколько раз, то можно столкнуться с нехваткой места на диске.
-В одном случае у меня скопировалось 38 файлов из 40. (перезапускал копирование)
+#### Ключевая пара для ssh
 
-```
-Caused by: java.io.IOException: Couldn't run retriable-command: Copying s3a://aresh2025-bucket-b1gdo3s8323p2nfiiqgl/2021-12-09.txt to hdfs://rc1a-dataproc-m-tke0g3povct0g352.mdb.yandexcloud.net/user/ubuntu/data/2021-12-09.txt
-	at org.apache.hadoop.tools.util.RetriableCommand.execute(RetriableCommand.java:101)
-	at org.apache.hadoop.tools.mapred.CopyMapper.copyFileWithRetry(CopyMapper.java:258)
-	... 11 more
-Caused by: org.apache.hadoop.ipc.RemoteException(java.io.IOException): File /user/ubuntu/data/.distcp.tmp.attempt_local790397167_0001_m_000000_0.1738085122124 could only be written to 0 of the 1 minReplication nodes. There are 1 datanode(s) running and 1 node(s) are excluded in this operation.
-	at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.chooseTarget4NewBlock(BlockManager.java:2278)
-	at org.apache.hadoop.hdfs.server.namenode.FSDirWriteFileOp.chooseTargetForNewBlock(FSDirWriteFileOp.java:294)
-	at org.apache.hadoop.hdfs.server.namenode.FSNamesystem.getAdditionalBlock(FSNamesystem.java:2808)
-	at org.apache.hadoop.hdfs.server.namenode.NameNodeRpcServer.addBlock(NameNodeRpcServer.java:905)
+Выполните интерактивную команду:
 
-
-
+```bash
+ssh-keygen -t ed25519
 ```
 
-![img.png](img.png)
+> Note: Назовите ключ `yc`. В противном случае измените переменную `SSH_PUBLIC_KEY_PATH` в файле `env.sh` и используйте свой путь к ключу в соответствующих командах.
 
-![img_1.png](img_1.png)
+
+### Копирование данных
+
+```bash
+DATAPROC_MASTER_FQDN=$(yc compute instance list --format json | jq -r '.[] | select(.labels.subcluster_role == "masternode") | .fqdn')
+echo $DATAPROC_MASTER_FQDN
+```
+
+```bash
+ssh -i ~/.ssh/yc ubuntu@<proxy_public_ip>
+```
+
+```bash
+ssh ubuntu@$DATAPROC_MASTER_FQDN
+./upload_data_to_hdfs.sh
+```
+
+
+

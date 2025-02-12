@@ -14,3 +14,5 @@ yc_dataproc_cluster_name = "aresh2025-dataproc-cluster"
 yc_dataproc_version      = "2.0"
 public_key_path          = "<your public ssh key path>.pub"
 private_key_path         = "<your private ssh key path>"
+yc_image_id              = "fd85hkli5dp6as39ali4" # Ubuntu 20.04 LTS
+yc_instance_name         = "aresh2025-proxy-vm"
