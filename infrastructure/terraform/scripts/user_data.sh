@@ -104,27 +104,27 @@ EOF
 
 chown ubuntu:ubuntu /home/ubuntu/.s3cfg
 chmod 600 /home/ubuntu/.s3cfg
-
-# Определяем целевой бакет
-TARGET_BUCKET=${s3_bucket}
-
-# Копируем конкретный файл из исходного бакета в наш новый бакет
-log "Copying file from source bucket to destination bucket"
-FILE_NAME="2022-11-04.txt"
-s3cmd cp \
-    --config=/home/ubuntu/.s3cfg \
-    --acl-public \
-    s3://otus-mlops-source-data/$FILE_NAME \
-    s3://$TARGET_BUCKET/$FILE_NAME
-
-# Проверяем успешность копирования
-if [ $? -eq 0 ]; then
-    log "File $FILE_NAME successfully copied to $TARGET_BUCKET"
-    log "Listing contents of $TARGET_BUCKET"
-    s3cmd ls --config=/home/ubuntu/.s3cfg s3://$TARGET_BUCKET/
-else
-    log "Error occurred while copying file $FILE_NAME to $TARGET_BUCKET"
-fi
+#
+## Определяем целевой бакет
+#TARGET_BUCKET=${s3_bucket}
+#
+## Копируем конкретный файл из исходного бакета в наш новый бакет
+#log "Copying file from source bucket to destination bucket"
+#FILE_NAME="2022-11-04.txt"
+#s3cmd cp \
+#    --config=/home/ubuntu/.s3cfg \
+#    --acl-public \
+#    s3://otus-mlops-source-data/$FILE_NAME \
+#    s3://$TARGET_BUCKET/$FILE_NAME
+#
+## Проверяем успешность копирования
+#if [ $? -eq 0 ]; then
+#    log "File $FILE_NAME successfully copied to $TARGET_BUCKET"
+#    log "Listing contents of $TARGET_BUCKET"
+#    s3cmd ls --config=/home/ubuntu/.s3cfg s3://$TARGET_BUCKET/
+#else
+#    log "Error occurred while copying file $FILE_NAME to $TARGET_BUCKET"
+#fi
 
 # Создаем директорию для скриптов на прокси-машине
 log "Creating scripts directory on proxy machine"
@@ -133,7 +133,7 @@ mkdir -p /home/ubuntu/scripts
 # Копируем скрипт upload_data_to_hdfs.sh на прокси-машину
 log "Copying upload_data_to_hdfs.sh script to proxy machine"
 echo '${upload_data_to_hdfs_content}' > /home/ubuntu/scripts/upload_data_to_hdfs.sh
-sed -i 's/{{ s3_bucket }}/'$TARGET_BUCKET'/g' /home/ubuntu/scripts/upload_data_to_hdfs.sh
+#sed -i 's/{{ s3_bucket }}/'$TARGET_BUCKET'/g' /home/ubuntu/scripts/upload_data_to_hdfs.sh
 
 # Устанавливаем правильные разрешения для скрипта на прокси-машине
 log "Setting permissions for upload_data_to_hdfs.sh on proxy machine"
