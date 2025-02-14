@@ -17,12 +17,18 @@ scp -i ~/.ssh/yc *.ipynb ubuntu@{fqdn-мастер-ноды}:
 ### Попадаем через Jupyter
 
 ```bash
+PROXY_PUBLIC_IP=158.160.47.172
+DATAPROC_MASTER_FQDN=$(yc compute instance list --format json | jq -r '.[] | select(.labels.subcluster_role == "masternode") | .fqdn')
+echo $DATAPROC_MASTER_FQDN
+
 # Проброс порта с вашей машины на Jump Server
-ssh -i ~/.ssh/yc -L 8888:localhost:8888 {публичный-IP-вашей-ВМ}
+ssh -i ~/.ssh/yc -L 8888:localhost:8888 ubuntu@$PROXY_PUBLIC_IP
 
 # Проброс порта с Jump Server на мастер-ноду
-ssh -i .ssh/yc -L 8888:localhost:8888 ubuntu@{fqdn-мастер-ноды}
+ssh -i .ssh/yc -L 8888:localhost:8888 ubuntu@$DATAPROC_MASTER_FQDN
 
 # Запуск Jupyter
 jupyter notebook
 ```
+
+### Получаем URL для подключения к Jupyter Notebook
