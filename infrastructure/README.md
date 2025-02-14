@@ -87,5 +87,21 @@ ssh-keygen -t ed25519
 > Note: Назовите ключ `yc`. В противном случае измените переменную `SSH_PUBLIC_KEY_PATH` в файле `env.sh` и используйте свой путь к ключу в соответствующих командах.
 
 
+### Копирование данных
+
+```bash
+DATAPROC_MASTER_FQDN=$(yc compute instance list --format json | jq -r '.[] | select(.labels.subcluster_role == "masternode") | .fqdn')
+echo $DATAPROC_MASTER_FQDN
+```
+
+```bash
+ssh -i ~/.ssh/yc ubuntu@<proxy_public_ip>
+```
+
+```bash
+ssh ubuntu@$DATAPROC_MASTER_FQDN
+./upload_data_to_hdfs.sh
+```
+
 
 

@@ -161,7 +161,7 @@ ssh -i /home/ubuntu/.ssh/dataproc_key -o StrictHostKeyChecking=no ubuntu@$DATAPR
 log "Script upload_data_to_hdfs.sh has been copied to the master node"
 
 # Ставим дополнительное ПО на мастер ноде
-ssh -i /home/ubuntu/.ssh/dataproc_key -o StrictHostKeyChecking=no ubuntu@$DATAPROC_MASTER_FQDN "pip install findspark"
+ssh -i /home/ubuntu/.ssh/dataproc_key -o StrictHostKeyChecking=no ubuntu@$DATAPROC_MASTER_FQDN "pip install findspark sh"
 log "python findspark installed on the master node"
 
 # Изменяем владельца лог-файла
