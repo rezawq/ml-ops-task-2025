@@ -32,3 +32,7 @@ jupyter notebook
 ```
 
 ### Получаем URL для подключения к Jupyter Notebook
+
+
+## Загрузка в бакет
+[upload_to_bucket.sh](upload_to_bucket.sh)
