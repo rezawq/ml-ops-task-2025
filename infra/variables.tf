@@ -29,6 +29,7 @@ variable "yc_storage_endpoint_url" {
 
 variable "ubuntu_image_id" {
   type    = string
+  default = "fd8kc2n656prni2cimp5"
 }
 
 variable "public_key_path" {
@@ -52,8 +53,4 @@ variable "yc_config" {
     cloud_id  = string
   })
   description = "Yandex Cloud configuration"
-}
-
-variable "airflow_db_conn_default" {
-  type = string
 }
