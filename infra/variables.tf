@@ -27,11 +27,6 @@ variable "yc_storage_endpoint_url" {
   default = "https://storage.yandexcloud.net"
 }
 
-variable "ubuntu_image_id" {
-  type    = string
-  default = "fd8kc2n656prni2cimp5"
-}
-
 variable "public_key_path" {
   type = string
 }
