@@ -32,6 +32,9 @@ resource "yandex_airflow_cluster" "airflow_cluster" {
     "api" = {
       "auth_backends" = "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
     }
+    "scheduler" = {
+       "dag_dir_list_interval" = "10"
+     }
   }
 
   logging = {

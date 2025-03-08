@@ -1,19 +1,19 @@
 """
-Script: data_preprocess.py
-DAG: data_preprocess
-Description: Simple DAG for Data Preprocessing with PySpark on Yandex.Cloud
+DAG: data_pipeline
+Description: DAG for processing data with Dataproc and PySpark.
 """
 
 import uuid
 from datetime import datetime, timedelta
 from airflow import DAG
+from airflow.operators.python import PythonOperator
 from airflow.settings import Session
 from airflow.models import Connection, Variable
 from airflow.utils.trigger_rule import TriggerRule
-from airflow.providers.yandex.operators.yandexcloud_dataproc import (
+from airflow.providers.yandex.operators.dataproc import (
     DataprocCreateClusterOperator,
     DataprocCreatePysparkJobOperator,
-    DataprocDeleteClusterOperator,
+    DataprocDeleteClusterOperator
 )
 
 # Общие переменные для вашего облака
@@ -58,7 +58,6 @@ YC_SA_CONNECTION = Connection(
     },
 )
 
-
 # Проверка наличия подключений в Airflow
 # Если подключения отсутствуют, то они добавляются
 # и сохраняются в базе данных Airflow
@@ -79,8 +78,10 @@ def setup_airflow_connections(*connections: Connection) -> None:
     session = Session()
     try:
         for conn in connections:
+            print("Checking connection:", conn.conn_id)
             if not session.query(Connection).filter(Connection.conn_id == conn.conn_id).first():
                 session.add(conn)
+                print("Added connection:", conn.conn_id)
         session.commit()
     except Exception as e:
         session.rollback()
@@ -89,43 +90,57 @@ def setup_airflow_connections(*connections: Connection) -> None:
         session.close()
 
 
-# Проверка и добавление подключений в Airflow
-setup_airflow_connections(YC_S3_CONNECTION, YC_SA_CONNECTION)
+# Функция для выполнения setup_airflow_connections в рамках оператора
+def run_setup_connections(**kwargs): # pylint: disable=unused-argument
+    """Создает подключения внутри оператора"""
+    setup_airflow_connections(YC_S3_CONNECTION, YC_SA_CONNECTION)
+    return True
 
 
 # Настройки DAG
 with DAG(
-    dag_id="data_preprocess",
-    start_date=datetime(year=2024, month=1, day=20),
+    dag_id="data_pipeline",
+    start_date=datetime(year=2025, month=3, day=7),
     schedule_interval=timedelta(minutes=30),
-    catchup=False,
-) as ingest_dag:
+    catchup=False
+) as dag:
+    # Задача для создания подключений
+    setup_connections = PythonOperator(
+        task_id="setup_connections",
+        python_callable=run_setup_connections,
+    )
+
     # 1 этап: создание Dataproc клаcтера
     create_spark_cluster = DataprocCreateClusterOperator(
         task_id="dp-cluster-create-task",
         folder_id=YC_FOLDER_ID,
         cluster_name=f"tmp-dp-{uuid.uuid4()}",
-        cluster_description="Temporary cluster for Spark processing under Airflow orchestration",
+        cluster_description="YC Temporary cluster for Spark processing under Airflow orchestration",
         subnet_id=YC_SUBNET_ID,
         s3_bucket=S3_DP_LOGS_BUCKET,
         service_account_id=DP_SA_ID,
         ssh_public_keys=YC_SSH_PUBLIC_KEY,
         zone=YC_ZONE,
         cluster_image_version="2.0",
+
         # masternode
         masternode_resource_preset="s3-c2-m8",
         masternode_disk_type="network-ssd",
         masternode_disk_size=20,
+
         # datanodes
         datanode_resource_preset="s3-c4-m16",
         datanode_disk_type="network-ssd",
         datanode_disk_size=50,
         datanode_count=2,
+
+        # computenodes
+        computenode_count=0,
+
         # software
         services=["YARN", "SPARK", "HDFS", "MAPREDUCE"],
-        computenode_count=0,
         connection_id=YC_SA_CONNECTION.conn_id,
-        dag=ingest_dag,
+        dag=dag,
     )
     # 2 этап: запуск задания PySpark
     poke_spark_processing = DataprocCreatePysparkJobOperator(
@@ -133,14 +148,14 @@ with DAG(
         main_python_file_uri=f"s3a://{S3_SRC_BUCKET}/src/pyspark_script.py",
         connection_id=YC_SA_CONNECTION.conn_id,
         args=["--bucket", S3_BUCKET_NAME],
-        dag=ingest_dag,
+        dag=dag,
     )
     # 3 этап: удаление Dataproc кластера
     delete_spark_cluster = DataprocDeleteClusterOperator(
         task_id="dp-cluster-delete-task",
         trigger_rule=TriggerRule.ALL_DONE,
-        dag=ingest_dag,
+        dag=dag,
     )
     # Формирование DAG из указанных выше этапов
     # pylint: disable=pointless-statement
-    create_spark_cluster >> poke_spark_processing >> delete_spark_cluster
+    setup_connections >> create_spark_cluster >> poke_spark_processing >> delete_spark_cluster
