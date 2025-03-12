@@ -14,7 +14,7 @@ dag = DAG(
     'hello_world_dag',  # DAG ID
     default_args=default_args,
     description='A simple Hello World DAG',
-    schedule_interval=timedelta(minutes=1),
+    schedule_interval=timedelta(minutes=30),
     catchup=False,  # Disable catchup to avoid backfilling
 )
 
