@@ -33,8 +33,6 @@ def clean_convert(source_path: str, output_path: str) -> None:
         StructField("tx_fraud_scenario", IntegerType(), False)
     ])
 
-    # File path
-    output_path_tmp = "data_convert/data.parquet"
 
     print("Try to read CSV files from source bucket...")
 
@@ -48,6 +46,9 @@ def clean_convert(source_path: str, output_path: str) -> None:
         mode="PERMISSIVE"  # Handles lines with more or fewer columns.
     )
 
+    # File path
+    output_path_tmp = "data_convert/data.parquet"
+
     print('Converting and saving to ', output_path_tmp)
 
     df = (df_txt.repartition(10)
@@ -55,14 +56,14 @@ def clean_convert(source_path: str, output_path: str) -> None:
           .mode("overwrite")
           .parquet(output_path_tmp))
 
-    # Clean the DataFrame by:
-    # 1. Dropping rows where all columns have null values.
-    # 2. Removing duplicate rows.
-    # 3. Filtering rows to include only those with a positive `tx_amount`.
-    df_cleaned = df.na.drop(how="all").distinct().filter(df.tx_amount > 0)
-
-    # Save the cleaned DataFrame as a Parquet file
-    df_cleaned.write.mode("overwrite").parquet(output_path)
+    # # Clean the DataFrame by:
+    # # 1. Dropping rows where all columns have null values.
+    # # 2. Removing duplicate rows.
+    # # 3. Filtering rows to include only those with a positive `tx_amount`.
+    # df_cleaned = df.na.drop(how="all").distinct().filter(df.tx_amount > 0)
+    #
+    # # Save the cleaned DataFrame as a Parquet file
+    # df_cleaned.write.mode("overwrite").parquet(output_path)
 
     # print('Records count after clean:', df_cleaned.count())
     #
@@ -81,7 +82,7 @@ def main():
     if not bucket_name:
         raise ValueError("Environment variable S3_BUCKET_NAME is not set")
 
-    input_path = f"s3://otus-mlops-source-data/2022-11-04.txt"
+    input_path = f"s3a://{bucket_name}/input_data/*.txt"
     output_path = f"s3a://{bucket_name}/output_data/clean_data.parquet"
     clean_convert(input_path, output_path)
 
