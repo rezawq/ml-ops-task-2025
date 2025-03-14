@@ -10,9 +10,6 @@ from pyspark.sql.types import StructType, StructField, LongType, TimestampType, 
 
 def clean_convert(source_path: str, output_path: str) -> None:
 
-
-    print('Entering clean_convert ')
-
     spark = (SparkSession
         .builder
         .appName("Read txt, clean, convert and save as Parquet")
@@ -47,14 +44,16 @@ def clean_convert(source_path: str, output_path: str) -> None:
     )
 
     # File path
-    output_path_tmp = "data_convert/data.parquet"
+    # output_path_tmp = "data_convert/data.parquet"
+    #
+    # print('Converting and saving to ', output_path_tmp)
 
-    print('Converting and saving to ', output_path_tmp)
-
-    df = (df_txt.repartition(10)
+    df = (df_txt
           .write
           .mode("overwrite")
-          .parquet(output_path_tmp))
+          .parquet(output_path))
+
+    # df.write.mode("overwrite").parquet(output_path)
 
     # # Clean the DataFrame by:
     # # 1. Dropping rows where all columns have null values.
