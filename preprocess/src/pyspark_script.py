@@ -85,7 +85,7 @@ def main():
     if not bucket_name:
         raise ValueError("Environment variable S3_BUCKET_NAME is not set")
 
-    input_path = f"s3a://{bucket_name}/input_data/2022-11-04.txt"
+    input_path = f"s3a://{bucket_name}/input_data/*.txt"
     output_path = f"s3a://{bucket_name}/output_data/clean_data.parquet"
     clean_convert(input_path, output_path, bucket_name)
 
