@@ -101,7 +101,7 @@ def run_setup_connections(**kwargs): # pylint: disable=unused-argument
 with DAG(
     dag_id="data_pipeline",
     start_date=datetime(year=2025, month=3, day=7),
-    schedule_interval=timedelta(minutes=1440),
+    schedule_interval=timedelta(minutes=360),
     catchup=False
 ) as dag:
     # Задача для создания подключений
@@ -126,19 +126,19 @@ with DAG(
         # masternode
         masternode_resource_preset="s3-c2-m8",
         masternode_disk_type="network-ssd",
-        masternode_disk_size=20,
+        masternode_disk_size=40,
 
         # datanodes
         datanode_resource_preset="s3-c4-m16",
         datanode_disk_type="network-ssd",
-        datanode_disk_size=50,
-        datanode_count=2,
+        datanode_disk_size=128,
+        datanode_count=3,
 
         # computenodes
         computenode_resource_preset="s3-c4-m16",
         computenode_disk_type="network-ssd",
-        computenode_disk_size=50,
-        computenode_count=2,
+        computenode_disk_size=128,
+        computenode_count=3,
 
         # software
         services=["YARN", "SPARK", "HDFS", "MAPREDUCE"],
