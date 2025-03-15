@@ -44,31 +44,32 @@ def clean_convert(source_path: str, output_path: str) -> None:
     )
 
     # File path
-    # output_path_tmp = "data_convert/data.parquet"
-    #
-    # print('Converting and saving to ', output_path_tmp)
+    output_path_tmp = "data_convert_tmp.parquet"
+
+    print('Converting and saving to ', output_path_tmp)
 
     df = (df_txt
+          .repartition(10)
           .write
           .mode("overwrite")
-          .parquet(output_path))
+          .parquet(output_path_tmp))
 
     # df.write.mode("overwrite").parquet(output_path)
 
-    # # Clean the DataFrame by:
-    # # 1. Dropping rows where all columns have null values.
-    # # 2. Removing duplicate rows.
-    # # 3. Filtering rows to include only those with a positive `tx_amount`.
-    # df_cleaned = df.na.drop(how="all").distinct().filter(df.tx_amount > 0)
-    #
-    # # Save the cleaned DataFrame as a Parquet file
-    # df_cleaned.write.mode("overwrite").parquet(output_path)
+    # Clean the DataFrame by:
+    # 1. Dropping rows where all columns have null values.
+    # 2. Removing duplicate rows.
+    # 3. Filtering rows to include only those with a positive `tx_amount`.
+    df_cleaned = df.na.drop(how="all").distinct().filter(df.tx_amount > 0)
+
+    # Save the cleaned DataFrame as a Parquet file
+    df_cleaned.write.mode("overwrite").parquet(output_path)
 
     # print('Records count after clean:', df_cleaned.count())
     #
     # # Stop the Spark session
-    # spark.stop()
-    # print("Successfully saved the result to the output bucket!")
+    spark.stop()
+    print("Successfully saved the result to the output bucket!")
 
 
 def main():
