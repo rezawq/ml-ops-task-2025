@@ -34,7 +34,7 @@ def clean_convert(source_path: str, output_path: str) -> None:
     print("Try to read CSV files from source bucket...")
 
     #Read the TXT file as a CSV file
-    df_txt = spark.read.csv(
+    df = spark.read.csv(
         source_path,
         header=False,
         comment="#",  # comment character
@@ -42,10 +42,10 @@ def clean_convert(source_path: str, output_path: str) -> None:
         sep=",",  # separator (comma in this case)
         mode="PERMISSIVE"  # Handles lines with more or fewer columns.
     )
-    df = (df_txt.repartition(10)
-          .write
-          .mode("overwrite")
-          .parquet("tmp.parquet"))
+    # df = (df_txt.repartition(10)
+    #       .write
+    #       .mode("overwrite")
+    #       .parquet("tmp.parquet"))
 
     # File path
     # output_path_tmp = "data_convert_tmp.parquet"
@@ -67,7 +67,7 @@ def clean_convert(source_path: str, output_path: str) -> None:
     df_cleaned = df.na.drop(how="all").distinct().filter(df.tx_amount > 0)
 
     # Save the cleaned DataFrame as a Parquet file
-    df_cleaned.repartition(10).write.mode("overwrite").parquet(output_path)
+    df_cleaned.write.mode("overwrite").parquet(output_path)
 
     # print('Records count after clean:', df_cleaned.count())
     #
@@ -86,7 +86,7 @@ def main():
     if not bucket_name:
         raise ValueError("Environment variable S3_BUCKET_NAME is not set")
 
-    input_path = f"s3a://{bucket_name}/input_data/*.txt"
+    input_path = f"s3a://{bucket_name}/input_data/2022-11-04.txt"
     output_path = f"s3a://{bucket_name}/output_data/clean_data.parquet"
     clean_convert(input_path, output_path)
 
