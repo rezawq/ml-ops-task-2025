@@ -11,7 +11,7 @@ s3cmd cp \
     --config=/home/ubuntu/.s3cfg \
     --acl-public \
     s3://otus-mlops-source-data/*.txt \
-    s3://$TARGET_BUCKET/input_data
+    s3://$TARGET_BUCKET/input_data/
 ```
 
 5. Залить исходный код скрипта обработки [pyspark_script.py](src/pyspark_script.py) с помощью
