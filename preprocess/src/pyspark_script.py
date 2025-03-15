@@ -42,7 +42,10 @@ def clean_convert(source_path: str, output_path: str) -> None:
         sep=",",  # separator (comma in this case)
         mode="PERMISSIVE"  # Handles lines with more or fewer columns.
     )
-    df= df_txt
+    df = (df_txt.repartition(10)
+          .write
+          .mode("overwrite")
+          .parquet("tmp.parquet"))
 
     # File path
     # output_path_tmp = "data_convert_tmp.parquet"
