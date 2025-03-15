@@ -8,7 +8,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, LongType, TimestampType, IntegerType, DoubleType
 
 
-def clean_convert(source_path: str, output_path: str) -> None:
+def clean_convert(source_path: str, output_path: str, bucket_name:str) -> None:
 
     spark = (SparkSession
         .builder
@@ -34,7 +34,7 @@ def clean_convert(source_path: str, output_path: str) -> None:
     print("Try to read CSV files from source bucket...")
 
     #Read the TXT file as a CSV file
-    df = spark.read.csv(
+    df_txt = spark.read.csv(
         source_path,
         header=False,
         comment="#",  # comment character
@@ -48,17 +48,16 @@ def clean_convert(source_path: str, output_path: str) -> None:
     #       .parquet("tmp.parquet"))
 
     # File path
-    # output_path_tmp = "data_convert_tmp.parquet"
+    output_path_tmp = f"s3a://{bucket_name}/output_data/tmp.parquet"
     #
     # print('Converting and saving to ', output_path_tmp)
     #
-    # df = (df_txt
-    #       .repartition(10)
-    #       .write
-    #       .mode("overwrite")
-    #       .parquet(output_path_tmp))
+    df = (df_txt
+          .repartition(10)
+          .write
+          .mode("overwrite")
+          .parquet(output_path_tmp))
 
-    # df.write.mode("overwrite").parquet(output_path)
 
     # Clean the DataFrame by:
     # 1. Dropping rows where all columns have null values.
@@ -67,7 +66,7 @@ def clean_convert(source_path: str, output_path: str) -> None:
     df_cleaned = df.na.drop(how="all").distinct().filter(df.tx_amount > 0)
 
     # Save the cleaned DataFrame as a Parquet file
-    df_cleaned.write.mode("overwrite").parquet(output_path)
+    df_cleaned.repartition(10).write.mode("overwrite").parquet(output_path)
 
     # print('Records count after clean:', df_cleaned.count())
     #
@@ -88,7 +87,7 @@ def main():
 
     input_path = f"s3a://{bucket_name}/input_data/2022-11-04.txt"
     output_path = f"s3a://{bucket_name}/output_data/clean_data.parquet"
-    clean_convert(input_path, output_path)
+    clean_convert(input_path, output_path, bucket_name)
 
 if __name__ == "__main__":
     main()
