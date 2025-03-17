@@ -18,3 +18,13 @@ s3cmd cp \
    `make upload-src-to-bucket`
 6. Запустить DAG в Airflowили дождаться запуска по расписанию
 7. Скачать обработанные файлы на диск `make download-output-data-from-bucket`
+
+## Скриншоты
+
+## Airflow
+![airflow_screenshot.png](airflow_screenshot.png)
+
+## Airflow last DAG
+![airflow_last_dag.png](airflow_last_dag.png)
+
+
