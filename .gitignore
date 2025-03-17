@@ -175,9 +175,10 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-/infrastructure/terraform/.terraform.lock.hcl
 /infrastructure/terraform/.terraform/
-/infrastructure/terraform/terraform.tfvars
-/infrastructure/terraform/terraform.tfstate
-/infrastructure/terraform/terraform.tfstate.backup
-/infrastructure/terraform/terraform-aresh2025.tfvars
+/infra/terraform/.terraform/
+**/terraform.tfvars
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/terraform-aresh2025.tfvars
