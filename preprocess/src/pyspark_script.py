@@ -42,21 +42,7 @@ def clean_convert(source_path: str, output_path: str, bucket_name:str) -> None:
         sep=",",  # separator (comma in this case)
         mode="PERMISSIVE"  # Handles lines with more or fewer columns.
     )
-    # df = (df_txt.repartition(10)
-    #       .write
-    #       .mode("overwrite")
-    #       .parquet("tmp.parquet"))
-
-    # File path
-    output_path_tmp = f"s3a://{bucket_name}/output_data/tmp.parquet"
-    #
-    # print('Converting and saving to ', output_path_tmp)
-    #
-    df = (df_txt
-          .repartition(10)
-          .write
-          .mode("overwrite")
-          .parquet(output_path_tmp))
+    df = df_txt
 
 
     # Clean the DataFrame by:
