@@ -1,9 +1,9 @@
 variable "yc_instance_user" {
-  type = string  
+  type = string
 }
 
 variable "yc_instance_name" {
-  type = string  
+  type = string
 }
 
 variable "yc_network_name" {
@@ -27,6 +27,10 @@ variable "yc_storage_endpoint_url" {
   default = "https://storage.yandexcloud.net"
 }
 
+variable "ubuntu_image_id" {
+  type    = string
+}
+
 variable "public_key_path" {
   type = string
 }
@@ -48,4 +52,22 @@ variable "yc_config" {
     cloud_id  = string
   })
   description = "Yandex Cloud configuration"
+}
+
+# MLflow variables
+variable "yc_mlflow_instance_name" {
+  type = string
+  description = "Name of the MLflow server instance"
+}
+
+# PostgreSQL variables
+variable "yc_postgres_cluster_name" {
+  type = string
+  description = "Name of the PostgreSQL cluster"
+}
+
+variable "postgres_password" {
+  type = string
+  description = "Password for PostgreSQL database used by MLflow"
+  sensitive = true
 }
