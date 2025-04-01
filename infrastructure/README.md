@@ -35,11 +35,11 @@ use_https = True
 EOF
 ```
 
-Значения `access_key` и `secret_key` берем из [terraform.tfstate](terraform/terraform.tfstate) после применения ```make tf_apply```
+Значения `access_key` и `secret_key` берем из [terraform.tfstate](terraform/terraform.tfstate) в ресурсе yandex_iam_service_account_static_access_key после применения ```make tf_apply```
 
 ```bash
 # Копируем
-TARGET_BUCKET=aresh2025-bucket-b1gdo3s8323p2nfiiqgl
+TARGET_BUCKET=rezawq-bucket-b1g13sct68pr90ornldm
 s3cmd sync --acl-public  s3://otus-mlops-source-data/ s3://$TARGET_BUCKET/
 ```
 
@@ -52,7 +52,7 @@ s3cmd sync --acl-public  s3://otus-mlops-source-data/ s3://$TARGET_BUCKET/
 ### 4. Копирование содержимого хранилища в файловую систему HDFS
 
 ```ssh
-ssh -l ubuntu 158.160.38.21
+ssh -i ~/.ssh/yc ubuntu@158.160.58.13
 ```
 IP динамический, смотреть в консоли облака
 

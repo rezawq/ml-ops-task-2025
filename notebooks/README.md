@@ -5,7 +5,7 @@
 ### Проброс порта для Jupyter
 
 ```bash
-PROXY_PUBLIC_IP=158.160.56.161
+PROXY_PUBLIC_IP=158.160.58.13
 DATAPROC_MASTER_FQDN=$(yc compute instance list --format json | jq -r '.[] | select(.labels.subcluster_role == "masternode") | .fqdn')
 echo $DATAPROC_MASTER_FQDN
 
