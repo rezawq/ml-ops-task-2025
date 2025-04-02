@@ -46,7 +46,7 @@ df = ( df_txt.repartition(10)
 # 1. Dropping rows where all columns have null values.
 # 2. Removing duplicate rows.
 # 3. Filtering rows to include only those with a positive `tx_amount`.
-df_cleaned = df.na.drop(how="all").distinct().filter(df.tx_amount>0)
+df_cleaned = df.na.drop(how="any").distinct().filter(df.tx_amount>0)
 
 # Save the cleaned DataFrame as a Parquet file
 df_cleaned.write.parquet(output_path, mode="overwrite")

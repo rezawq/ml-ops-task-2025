@@ -49,7 +49,7 @@ def clean_convert(source_path: str, output_path: str, bucket_name:str) -> None:
     # 1. Dropping rows where all columns have null values.
     # 2. Removing duplicate rows.
     # 3. Filtering rows to include only those with a positive `tx_amount`.
-    df_cleaned = df.na.drop(how="all").distinct().filter(df.tx_amount > 0)
+    df_cleaned = df.na.drop(how="any").distinct().filter(df.tx_amount > 0)
 
     # Save the cleaned DataFrame as a Parquet file
     df_cleaned.repartition(10).write.mode("overwrite").parquet(output_path)
