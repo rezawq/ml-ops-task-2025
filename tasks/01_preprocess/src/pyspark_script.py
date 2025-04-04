@@ -63,6 +63,7 @@ def clean_convert(source_path: str, output_path: str, bucket_name:str) -> None:
 
 def main():
     """Main function to execute the PySpark job"""
+    print("DEBUG start preprocessing of data")
     parser = ArgumentParser()
     parser.add_argument("--bucket", required=True, help="S3 bucket name")
     args = parser.parse_args()
@@ -72,7 +73,7 @@ def main():
         raise ValueError("Environment variable S3_BUCKET_NAME is not set")
 
     input_path = f"s3a://{bucket_name}/input_data/*.txt"
-    output_path = f"s3a://{bucket_name}/output_data/clean_data.parquet"
+    output_path = f"s3a://{bucket_name}/preprocessed_data/input_data.parquet"
     clean_convert(input_path, output_path, bucket_name)
 
 if __name__ == "__main__":
