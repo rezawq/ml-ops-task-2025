@@ -182,3 +182,5 @@ cython_debug/
 **/terraform.tfstate
 **/terraform.tfstate.backup
 **/terraform-aresh2025.tfvars
+/tasks/02_retrain/.env
+/tasks/01_preprocess/.env

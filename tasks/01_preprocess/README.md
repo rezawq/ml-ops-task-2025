@@ -1,7 +1,7 @@
 # Предварительная обработка данных по расписанию в Apache Airflow и временном кластере Spark
 
-1. Создать инфраструктуру с помощью [infra](../infra)
-2. Сконфигурировать Apache Airflow c помощью [variables.json](../infra/variables.json)
+1. Создать инфраструктуру с помощью [infra](../../infra)
+2. Сконфигурировать Apache Airflow c помощью [variables.json](../../infra/variables.json)
 3. Залить DAG `make upload-dags-to-bucket`
 4. Залить исходные данные. Либо из [input_data](input_data) с помощью  `make upload-data-to-bucket`. Либо командой
 
